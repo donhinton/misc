@@ -1,0 +1,74 @@
+/* -*- Mode: C++ -*-
+//
+// \file: __FILE_NAME__
+//
+// \author: __AUTHOR__
+// \date: __DATE__
+//
+// \brief: <add brief description here>
+//
+*/
+
+#include <__HEADER_FILE__>
+#include <getopt.h>
+#include <iostream>
+
+static bool g_debug = false;
+
+namespace {
+
+int parse(int argc, char **argv) {
+  int c;
+  int retval = 0;
+
+  int option_index = 0;
+  struct option long_options[] = {{"debug", no_argument, 0, 'd'},
+                                  {"file", required_argument, 0, 'f'},
+                                  {0, 0, 0, 0}};
+
+  while (1) {
+    c = getopt_long(argc, argv, ":df:", long_options, &option_index);
+    if (c == -1)
+      break;
+
+    switch (c) {
+    case 'd':
+      g_debug = true;
+      break;
+    case 'f':
+      // check optarg for value
+      std::cout << "file = " << optarg << "\n";
+      break;
+    case ':':
+      // missing argument, optopt set to option
+      std::cout << "error: " << static_cast<char>(optopt)
+                << " missing argument.\n";
+      retval = 1;
+      break;
+    case '?':
+      // bad option
+      std::cout << "error: unknown option '" << static_cast<char>(optopt)
+                << "'\n";
+      retval = 1;
+      break;
+    default:
+      // ignore arguments
+      std::cout << "default\n";
+      break;
+    }
+  }
+  return retval;
+}
+
+} // annonymous namespace
+
+int main(int argc, char *argv[]) {
+  std::cout << "Starting..." << std::endl << std::endl;
+
+  if (parse(argc, argv) != 0)
+    return 1;
+
+  std::cout << std::endl << "done..." << std::endl;
+
+  return 0;
+}

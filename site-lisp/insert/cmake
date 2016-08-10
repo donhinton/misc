@@ -1,0 +1,57 @@
+
+# -*- cmake -*-
+
+################################################################################
+# Top level Start
+cmake_minimum_required(VERSION 3.5)
+
+#project(
+#  <PROJECT-NAME>
+#	[VERSION <major>[.<minor>[.<patch>[.<tweak>]]]]
+#	[LANGUAGES <language-name>...])
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# We need C++ 11
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# Make Debug the default, pass -DCMAKE_BUILD_TYPE=Release to change this.
+if (NOT CMAKE_BUILD_TYPE)
+	message ("Setting CMAKE_BUILD_TYPE = Debug")
+	set(CMAKE_BUILD_TYPE Debug)
+endif()
+
+# enable CTest
+#enable_testing()
+
+#include(cmakefile)
+
+# Top Level End
+################################################################################
+
+
+#add_subdirectory(somedir)
+
+#find_package(
+# <package> [version] [EXACT] [QUIET] [MODULE]
+# [REQUIRED] [[COMPONENTS] [components...]]
+# [OPTIONAL_COMPONENTS components...]
+# [NO_POLICY_SCOPE])
+
+#include_directories(somedir)
+#add_executable(exe file.cpp)
+#target_link_libraries(exe|lib target|var|etc)
+
+# simple form needs absolute path
+#add_test(Name ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/executable [arg1 [arg2 ...]])
+
+# more complex, but no need for absolute path
+#add_test(
+# NAME <name> [CONFIGURATIONS [Debug|Release|...]]
+# [WORKING_DIRECTORY dir]
+# COMMAND <command> [arg1 [arg2 ...]])

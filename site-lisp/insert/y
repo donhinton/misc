@@ -1,0 +1,36 @@
+/* -*- Mode: C++ -*-
+//
+// \file: __FILE_NAME__
+//
+// \author: __AUTHOR__
+// \date: __DATE__
+//
+// \brief: <add brief description here>
+//
+*/
+
+%{
+
+// includes go here
+// add all includes required by this header, but no more
+// forward declarations
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+// add C header includes that don't include extern "C" wrappers
+// and any additional C declarations here
+#ifdef __cplusplus
+}
+#endif
+
+
+  int num_lines = 0, num_chars = 0;
+%}
+// BISON DECLARATIONS
+
+%%
+// GRAMMAR RULES
+
+%%
+// EPILOGUE

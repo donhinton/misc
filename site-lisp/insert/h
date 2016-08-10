@@ -1,0 +1,23 @@
+/* -*- Mode: C++ -*-
+//
+// \file: __FILE_NAME__
+//
+// \author: __AUTHOR__
+// \date: __DATE__
+//
+// \brief: <add brief description here>
+//
+*/
+
+#ifndef __INCLUDE_GUARD__
+#define __INCLUDE_GUARD__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __INCLUDE_GUARD__ */

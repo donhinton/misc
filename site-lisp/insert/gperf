@@ -1,0 +1,38 @@
+/* -*- Mode: C++ -*-
+//
+// \file: __FILE_NAME__
+//
+// \author: __AUTHOR__
+// \date: __DATE__
+//
+// \brief: <add brief description here>
+//
+*/
+
+%{
+/* C code that goes verbatim in output */
+
+// only add include files actually needed
+
+// forward declarations
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+  // add C header includes that don't include extern "C" wrappers
+  // and any additional C declarations here
+#ifdef __cplusplus
+}
+#endif
+
+
+// add additional namespaces and declarations here
+
+// add inline functions here
+
+%}
+// declarations
+%%
+replace with keywords, matching struct in declaration section
+%%
+//functions

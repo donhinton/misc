@@ -1,0 +1,155 @@
+#! /bin/ksh
+#
+# \file: __FILE_NAME__
+#
+# \author: __AUTHOR__
+# \date: __DATE__
+#
+# \brief: <add brief description here>
+#
+
+# Logging
+log() {
+    if [ ${SILENT} -ne 1 ]; then
+        NOW=$(date +"%Y%m%d %H:%M:%S")
+        if [ ${LOG_TO_FILE} -eq 1 ]; then
+            echo "${NOW} -- $*" | tee -a ${LOG_FILE}
+        else
+            echo "${NOW} -- $*"
+        fi
+    fi
+}
+
+log_sync() {
+    while read line
+    do
+        log ${line}
+    done
+}
+
+debug () {
+    if [ ${DEBUG} -eq 1 ]; then
+	log "$*"
+    fi
+}
+
+error() {
+    log "error: $*"
+}
+
+send_message() {
+    if [ ${SILENT} -ne 1 ] && [ ${EMAIL_LOGFILE} -eq 1 ]; then
+        if [ ${LOG_TO_FILE} -eq 1 ]; then
+            ATTACHMENT="-a ${LOG_FILE}"
+        fi
+        echo "" | xmail -s "${EMAIL_SUBJECT}" ${ATTACHMENT} `unixinfo -e dhinton`
+    fi
+}
+
+exit_script() {
+    log "exiting script: return code = ${ERROR_CODE}"
+    if [ ${ERROR_CODE} -ne 0 ]; then
+        if [ -z "${ERROR_MSG}" ]; then
+            ERROR_MSG="unknown error"
+        fi
+        EMAIL_SUBJECT="${0##*/} ${ERROR_MSG}"
+    fi
+    send_message
+    exit ${ERROR_CODE}
+}
+
+usage () {
+    echo "usage: test.sh [OPTIONS]"
+    echo " Options:"
+    echo "  -L              Do not write to logfile."
+    echo "  -M              Do not email logfile."
+    echo "  -l logfile      Name of logfile to use (default: ${LOGFILE_DEFAULT})."
+    echo "  -k N            Number of logfiles to keep (default: ${LOG_NUM_DEFAULT})."
+    echo "  -s              Silent: no output."
+    echo "  -d              Turn on debugging"
+    echo "  -h,-?           Print this message and exit"
+    echo
+}
+
+LOG_FILE_DEFAULT="${0##*/}.ulog"
+LOG_NUM_DEFAULT=10
+
+LOG_FILE="${LOG_FILE_DEFAULT}"
+LOG_NUM=${LOG_NUM_DEFAULT}
+LOG_TO_FILE=1
+EMAIL_LOGFILE=1
+
+SILENT=0
+DEBUG=0
+EMAIL_SUBJECT="${0##*/} finished succesfully"
+ERROR_CODE=0
+
+# -e is just for testing the exit_script
+while getopts "eLMl:k:sd?h" VAR;
+do
+    case $VAR in
+        e)
+            ERROR_MSG="some error occurred"
+            ERROR_CODE=1
+            ;;
+        L)
+            LOG_TO_FILE=0
+            ;;
+        M)
+            EMAIL_LOGFILE=0
+            ;;
+        l)
+            LOG_FILE="${OPTARG}"
+            ;;
+        k)
+            LOG_NUM="${OPTARG}"
+            ;;
+        s)
+            SILENT=1
+            ;;
+        d)
+            DEBUG=1
+            ;;
+        h|?)
+            usage
+            exit
+            ;;
+    esac
+done
+
+# todo: need to fix email list
+EMAIL_TO="${EMAIL_TO_LIST}"
+EMAIL_FROM=
+
+# Start logging
+if [ ${SILENT} -eq 0 ] && [ ${LOG_TO_FILE} -eq 1 ]; then
+    age_logfile ${LOG_FILE} ${LOG_NUM}
+fi
+
+log "Starting ${0##*/}"
+if [ ${LOG_TO_FILE} -eq 1 ]; then
+    log "logfile = ${LOG_FILE}"
+fi
+
+################################################################################
+# add functions here:
+
+################################################################################
+# Main program goes here:
+
+################################################################################
+# some examples:
+
+# piping output to log
+ls 2>&1 | log_sync
+
+# error example
+if [ ${ERROR_CODE} -ne 0 ]; then
+    error "something bad happened"
+    exit_script
+fi
+
+# and we're done.
+log "done"
+
+exit_script
