@@ -2,7 +2,7 @@
 
 set -o emacs
 
-export TERM=xterm-256color
+export TERM=screen-256color
 
 # Avoid duplicates
 export HISTCONTROL=ignoredups:erasedups
@@ -22,7 +22,7 @@ export HISTFILESIZE HISTSIZE PAGER PS1
 # turn off bell
 #xset -b
 
-export PATH=${PATH}:~/projects/phab/arcanist/bin
+#export PATH=${PATH}:~/projects/phab/arcanist/bin
 
 export CCACHE_CPP2=yes
 

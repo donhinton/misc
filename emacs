@@ -26,6 +26,7 @@
 
 (require 'cc-mode)
 (load '"~/site-lisp/emacs.el")
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
 (require 'clang-format)
 (require 'git)
