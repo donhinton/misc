@@ -1,5 +1,19 @@
 ;; -*- emacs-list -*-
 
+
+(define-generic-mode 'bnf-mode
+  '("#")
+  nil
+  '(("^<.*?>" . 'font-lock-variable-name-face)
+    ("<.*?>" . 'font-lock-keyword-face)
+    ("::=" . 'font-lock-warning-face)
+    ("\|" . 'font-lock-warning-face))
+  '("\\.bnf\\.pybnf\\'")
+  nil
+  "Major mode for BNF highlighting.")
+
+
+
 (setq user-full-name '"Don Hinton")
 (setq user-mail-address '"hintonda@gmail.com")
 
@@ -38,6 +52,8 @@
 
 (require 'tablegen-mode)
 
+(require 'llvm-mode)
+
 (require 'cmake-mode)
 (setq auto-mode-alist
       (append '(("CMakeLists\\.txt\\'" . cmake-mode)
@@ -52,11 +68,13 @@
 
 (setq-default tab-width 2)
 (custom-set-variables
- '(tab-stop-list
-	 (quote
-		(2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40
-			 42 44 46 48 50 52 54 56 58 60 62 64 68 70 72 74 76 78 80)
-		)))
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes (quote ("400994f0731b2109b519af2f2d1f022e7ced630a78890543526b9342a3b04cf1" default)))
+ '(safe-local-variable-values (quote ((related-file-name . "../include/click/driver.hh") (related-file-name . "../include/click/userutils.hh") (related-file-name . "../../lib/master.cc") (related-file-name . "../../lib/router.cc") (related-file-name . "../../../elements/standard/scheduleinfo.cc"))))
+ '(tab-stop-list (quote (2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60 62 64 68 70 72 74 76 78 80))))
 
 ;; don't show startup message
 (setq inhibit-startup-message t)
@@ -120,12 +138,7 @@
 (setq calendar-week-start-day 1) ; week starts on monday
 (setq undo-limit 1000000) ; increase undo limit
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes (quote ("400994f0731b2109b519af2f2d1f022e7ced630a78890543526b9342a3b04cf1" default))))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
