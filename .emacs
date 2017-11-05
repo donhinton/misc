@@ -33,6 +33,10 @@
 
 (add-to-list 'load-path "~/site-lisp")
 
+;; dockerfile https://github.com/spotify/dockerfile-mode
+(require 'dockerfile-mode)
+(add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
+
 ;; color scheme
 (require 'color-theme)
 (add-to-list 'custom-theme-load-path "~/site-lisp/color-theme")
