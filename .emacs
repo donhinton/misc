@@ -71,14 +71,6 @@
 (global-auto-revert-mode t)
 
 (setq-default tab-width 2)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes (quote ("400994f0731b2109b519af2f2d1f022e7ced630a78890543526b9342a3b04cf1" default)))
- '(safe-local-variable-values (quote ((related-file-name . "../include/click/driver.hh") (related-file-name . "../include/click/userutils.hh") (related-file-name . "../../lib/master.cc") (related-file-name . "../../lib/router.cc") (related-file-name . "../../../elements/standard/scheduleinfo.cc"))))
- '(tab-stop-list (quote (2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60 62 64 68 70 72 74 76 78 80))))
 
 ;; don't show startup message
 (setq inhibit-startup-message t)
