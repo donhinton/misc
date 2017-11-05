@@ -23,7 +23,7 @@ export HISTFILESIZE HISTSIZE PAGER PS1
 #xset -b
 
 export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:
-export PATH=${PATH}:~/projects/phab/arcanist/bin
+export PATH=${PATH}:~/projects/arc/arcanist/bin:~/bin
 
 export CCACHE_CPP2=yes
 

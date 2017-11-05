@@ -25,9 +25,10 @@ if [ -d ${PROJ_DIR} ] ; then
   if [ "$BRANCH" != "master" ]; then
     git rebase master
   fi
+  ###
 else
   cd ${SUBDIR}
-  git clone https://llvm.org/git/${PROJ}.git
+  git clone https://git.llvm.org/git/${PROJ}.git
   cd ${PROJ_DIR}
   git svn init https://llvm.org/svn/llvm-project/${PROJ}/trunk --username=dhinton
   git config svn-remote.svn.fetch :refs/remotes/origin/master
@@ -41,10 +42,18 @@ SUBDIR=${ROOT_DIR}/llvm/projects
 PROJ_DIR=${SUBDIR}/${PROJ}
 if [ -d ${PROJ_DIR} ] ; then
   cd ${PROJ_DIR} 
+  MSG=$(git stash)
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
   ${ROOT_DIR}/llvm/utils/git-svn/git-svnup
+  if [ "$MSG" != "No local changes to save" ]; then
+    git stash pop
+	fi
+  if [ "$BRANCH" != "master" ]; then
+    git rebase master
+  fi
 else
   cd ${SUBDIR}
-  git clone https://llvm.org/git/${PROJ}.git
+  git clone https://git.llvm.org/git/${PROJ}.git
   cd ${PROJ_DIR}
   git svn init https://llvm.org/svn/llvm-project/${PROJ}/trunk --username=dhinton
   git config svn-remote.svn.fetch :refs/remotes/origin/master
@@ -58,10 +67,18 @@ SUBDIR=${ROOT_DIR}/llvm/projects
 PROJ_DIR=${SUBDIR}/${PROJ}
 if [ -d ${PROJ_DIR} ] ; then
   cd ${PROJ_DIR} 
+  MSG=$(git stash)
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
   ${ROOT_DIR}/llvm/utils/git-svn/git-svnup
+  if [ "$MSG" != "No local changes to save" ]; then
+    git stash pop
+	fi
+  if [ "$BRANCH" != "master" ]; then
+    git rebase master
+  fi
 else
   cd ${SUBDIR}
-  git clone https://llvm.org/git/${PROJ}.git
+  git clone https://git.llvm.org/git/${PROJ}.git
   cd ${PROJ_DIR}
   git svn init https://llvm.org/svn/llvm-project/${PROJ}/trunk --username=dhinton
   git config svn-remote.svn.fetch :refs/remotes/origin/master
@@ -74,10 +91,18 @@ SUBDIR=${ROOT_DIR}/llvm/projects
 PROJ_DIR=${SUBDIR}/${PROJ}
 if [ -d ${PROJ_DIR} ] ; then
   cd ${PROJ_DIR} 
+  MSG=$(git stash)
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
   ${ROOT_DIR}/llvm/utils/git-svn/git-svnup
+  if [ "$MSG" != "No local changes to save" ]; then
+    git stash pop
+	fi
+  if [ "$BRANCH" != "master" ]; then
+    git rebase master
+  fi
 else
   cd ${SUBDIR}
-  git clone https://llvm.org/git/${PROJ}.git
+  git clone https://git.llvm.org/git/${PROJ}.git
   cd ${PROJ_DIR}
   git svn init https://llvm.org/svn/llvm-project/${PROJ}/trunk --username=dhinton
   git config svn-remote.svn.fetch :refs/remotes/origin/master
@@ -90,10 +115,18 @@ SUBDIR=${ROOT_DIR}/llvm/projects
 PROJ_DIR=${SUBDIR}/${PROJ}
 if [ -d ${PROJ_DIR} ] ; then
   cd ${PROJ_DIR} 
+  MSG=$(git stash)
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
   ${ROOT_DIR}/llvm/utils/git-svn/git-svnup
+  if [ "$MSG" != "No local changes to save" ]; then
+    git stash pop
+	fi
+  if [ "$BRANCH" != "master" ]; then
+    git rebase master
+  fi
 else
   cd ${SUBDIR}
-  git clone https://llvm.org/git/${PROJ}.git
+  git clone https://git.llvm.org/git/${PROJ}.git
   cd ${PROJ_DIR}
   git svn init https://llvm.org/svn/llvm-project/${PROJ}/trunk --username=dhinton
   git config svn-remote.svn.fetch :refs/remotes/origin/master
@@ -117,7 +150,7 @@ if [ -d ${PROJ_DIR} ] ; then
   fi
 else
   cd ${SUBDIR}
-  git clone https://llvm.org/git/${PROJ}.git
+  git clone https://git.llvm.org/git/${PROJ}.git
   cd ${PROJ_DIR}
   git svn init https://llvm.org/svn/llvm-project/cfe/trunk --username=dhinton
   git config svn-remote.svn.fetch :refs/remotes/origin/master
@@ -130,12 +163,71 @@ SUBDIR=${ROOT_DIR}/llvm/tools/clang/tools
 PROJ_DIR=${SUBDIR}/${PROJ}
 if [ -d ${PROJ_DIR} ] ; then
   cd ${PROJ_DIR} 
+  MSG=$(git stash)
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
   ${ROOT_DIR}/llvm/utils/git-svn/git-svnup
+  if [ "$MSG" != "No local changes to save" ]; then
+    git stash pop
+	fi
+  if [ "$BRANCH" != "master" ]; then
+    git rebase master
+  fi
 else
   cd ${SUBDIR}
-  git clone https://llvm.org/git/clang-tools-${PROJ}.git ${PROJ}
+  git clone https://git.llvm.org/git/clang-tools-${PROJ}.git ${PROJ}
   cd ${PROJ_DIR}
   git svn init https://llvm.org/svn/llvm-project/clang-tools-${PROJ}/trunk --username=dhinton
   git config svn-remote.svn.fetch :refs/remotes/origin/master
   git svn rebase -l  # -l avoids fetching ahead of the git mirror.
+fi
+
+exit 0;
+
+# real lldb
+PROJ=lldb
+SUBDIR=${ROOT_DIR}/llvm/tools
+PROJ_DIR=${SUBDIR}/${PROJ}
+if [ -d ${PROJ_DIR} ] ; then
+  cd ${PROJ_DIR}
+  MSG=$(git stash)
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  ${ROOT_DIR}/llvm/utils/git-svn/git-svnup
+  if [ "$MSG" != "No local changes to save" ]; then
+    git stash pop
+	fi
+  if [ "$BRANCH" != "master" ]; then
+    git rebase master
+  fi
+else
+  cd ${SUBDIR}
+  git clone https://git.llvm.org/git/${PROJ}.git
+  cd ${PROJ_DIR}
+  git svn init https://llvm.org/svn/llvm-project/${PROJ}/trunk --username=dhinton
+  git config svn-remote.svn.fetch :refs/remotes/origin/master
+  git svn rebase -l  # -l avoids fetching ahead of the git mirror.
+fi
+
+
+exit
+
+# my lldb fork
+PROJ=lldb
+SUBDIR=${ROOT_DIR}/llvm/tools
+PROJ_DIR=${SUBDIR}/${PROJ}
+if [ -d ${PROJ_DIR} ] ; then
+  cd ${PROJ_DIR}
+  MSG=$(git stash)
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  #${ROOT_DIR}/llvm/utils/git-svn/git-svnup
+  git pull
+	if [ "$MSG" != "No local changes to save" ]; then
+    git stash pop
+	fi
+  if [ "$BRANCH" != "master" ]; then
+    git rebase master
+  fi
+else
+	cd ${SUBDIR}
+	git clone git@github.com:donhinton/lldb.git
+  cd ${PROJ_DIR}
 fi
