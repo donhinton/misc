@@ -2,10 +2,15 @@
 FROM ubuntu:xenial
 
 # Build like this:
-# docker build <path to dir containing this file>
+# docker build [-t <name:tag>] --build-arg user=${USER} <path to dir containing this file>
 
 # In order to run gdb, you need to run this image like this:
-# docker run --privileged -it <image>
+# Access <hostdir> as /home/${USER}/<containerdir> via the '-v' option
+# docker run [-v <hostdir>:/home/${USER}/<containerdir>] --privileged -it <image>
+
+# Require "--build-arg user=<some user>" was passed.
+ARG user
+RUN test -n "${user}"
 
 RUN set -ex; apt-get -yqq update; apt-get -yqq upgrade
 RUN set -ex; apt-get -yqq install \
@@ -17,7 +22,9 @@ RUN set -ex; apt-get -yqq install \
   curl \
   wget \
   emacs \
+  subversion \
   git \
+  git-svn \
   gdb \
   man
 
@@ -45,17 +52,15 @@ RUN set -ex; \
   tar -xf cmake-3.7.2-Linux-x86_64.tar.gz -C /usr/local --strip-components=1; \
   rm cmake-3.7.2-*;
 
-RUN set -ex; \
-  git clone https://github.com/donhinton/misc.git; \
-	misc/scripts/deploy_dotfiles.sh
+ENV user ${user}
 
 # setup user
 RUN set -ex; \
-  useradd -m dhinton; \
-  echo 'dhinton  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers;
+  useradd -m ${user}; \
+  echo "${user}  ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers;
 
-USER dhinton
-WORKDIR /home/dhinton
+USER ${user}
+WORKDIR /home/${user}
 
 # FIXME: Break this out into it's own Dockerfile, so I can run build
 # with '--no-cache' for just the clang/llvm part
@@ -63,6 +68,4 @@ WORKDIR /home/dhinton
 RUN set -ex; \
   git clone https://github.com/donhinton/misc.git; \
   misc/scripts/deploy_dotfiles.sh; \
-  mkdir llvm_project; \
-  git clone https://git.llvm.org/git/llvm.git llvm_project/llvm; \
-  git clone https://git.llvm.org/git/clang.git llvm_project/llvm/tools/clang;
+  sudo su - -c "/home/dhinton/misc/scripts/deploy_dotfiles.sh"
