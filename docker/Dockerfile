@@ -10,13 +10,13 @@ FROM ubuntu:xenial
 RUN set -ex; apt-get -yqq update; apt-get -yqq upgrade
 RUN set -ex; apt-get -yqq install \
   sudo \
-	build-essential \
-	ninja-build \
-	libedit-dev \
-	python2.7-dev \
-	curl \
-	wget \
-	emacs \
+  build-essential \
+  ninja-build \
+  libedit-dev \
+  python2.7-dev \
+  curl \
+  wget \
+  emacs \
   git \
   gdb \
   man
@@ -40,7 +40,7 @@ RUN set -ex; \
   curl -fSL https://cmake.org/files/v3.7/cmake-3.7.2-SHA-256.txt -o cmake-3.7.2-SHA-256.txt; \
   curl -fSL https://cmake.org/files/v3.7/cmake-3.7.2-SHA-256.txt.asc -o cmake-3.7.2-SHA-256.txt.asc; \
   curl -fSL https://cmake.org/files/v3.7/cmake-3.7.2-Linux-x86_64.tar.gz -o cmake-3.7.2-Linux-x86_64.tar.gz; \
-    gpg --verify cmake-3.7.2-SHA-256.txt.asc; \
+  gpg --verify cmake-3.7.2-SHA-256.txt.asc; \
   grep cmake-3.7.2-Linux-x86_64.tar.gz cmake-3.7.2-SHA-256.txt | sha256sum --check; \
   tar -xf cmake-3.7.2-Linux-x86_64.tar.gz -C /usr/local --strip-components=1; \
   rm cmake-3.7.2-*;
@@ -52,7 +52,7 @@ RUN set -ex; \
 # setup user
 RUN set -ex; \
   useradd -m dhinton; \
-	echo 'dhinton  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers;
+  echo 'dhinton  ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers;
 
 USER dhinton
 WORKDIR /home/dhinton
@@ -62,7 +62,7 @@ WORKDIR /home/dhinton
 # setup clang+llvm dev environment
 RUN set -ex; \
   git clone https://github.com/donhinton/misc.git; \
-	misc/scripts/deploy_dotfiles.sh; \
+  misc/scripts/deploy_dotfiles.sh; \
   mkdir llvm_project; \
   git clone https://git.llvm.org/git/llvm.git llvm_project/llvm; \
   git clone https://git.llvm.org/git/clang.git llvm_project/llvm/tools/clang;
