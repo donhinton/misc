@@ -1,5 +1,11 @@
 ;; -*- emacs-list -*-
 
+(defun load-if-exists (f)
+  (if (file-readable-p f)
+      (load-file f)))
+
+;; get private variables, e.g., user-full-name and user-mail-address
+(load-if-exists "~/.emacs.user.el")
 
 (define-generic-mode 'bnf-mode
   '("#")
@@ -11,11 +17,6 @@
   '("\\.bnf\\.pybnf\\'")
   nil
   "Major mode for BNF highlighting.")
-
-
-
-(setq user-full-name '"Don Hinton")
-(setq user-mail-address '"hintonda@gmail.com")
 
 ;; Goto line like in XEmacs:
 (define-key global-map (kbd "M-g") 'goto-line)
