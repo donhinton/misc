@@ -1,5 +1,5 @@
 # start from base
-FROM ubuntu:xenial
+FROM gcc:6
 
 # Build like this:
 # docker build [-t <name:tag>] --build-arg user=${USER} <path to dir containing this file>
@@ -11,22 +11,7 @@ FROM ubuntu:xenial
 # Require "--build-arg user=<some user>" was passed.
 ARG user
 RUN test -n "${user}"
-
-RUN set -ex; apt-get -yqq update; apt-get -yqq upgrade
-RUN set -ex; apt-get -yqq install \
-  sudo \
-  build-essential \
-  ninja-build \
-  libedit-dev \
-  python2.7-dev \
-  curl \
-  wget \
-  emacs \
-  subversion \
-  git \
-  git-svn \
-  gdb \
-  man
+ENV user ${user}
 
 # 4096R/345AD05D 2015-01-20 Hans Wennborg <hans@chromium.org>
 # 2048R/02119294 2014-05-06 Tom Stellard <tstellar@redhat.com>
@@ -43,7 +28,24 @@ RUN set -ex; \
     gpg --keyserver hkp://ha.pool.sks-keyservers.net --recv-keys "$key"; \
   done
 
-RUN set -ex; \
+RUN \
+  set -ex; \
+  apt-get -yqq update; \
+  apt-get -yqq upgrade; \
+  apt-get -yqq install \
+  sudo \
+  ninja-build \
+  libedit-dev \
+  python2.7-dev \
+  curl \
+  wget \
+  emacs \
+  git-svn \
+  gdb \
+  man; \
+  #apt-get -yqq clean; \
+  #rm -rf /var/lib/apt/lists/*; \
+  \
   curl -fSL https://cmake.org/files/v3.7/cmake-3.7.2-SHA-256.txt -o cmake-3.7.2-SHA-256.txt; \
   curl -fSL https://cmake.org/files/v3.7/cmake-3.7.2-SHA-256.txt.asc -o cmake-3.7.2-SHA-256.txt.asc; \
   curl -fSL https://cmake.org/files/v3.7/cmake-3.7.2-Linux-x86_64.tar.gz -o cmake-3.7.2-Linux-x86_64.tar.gz; \
@@ -51,8 +53,6 @@ RUN set -ex; \
   grep cmake-3.7.2-Linux-x86_64.tar.gz cmake-3.7.2-SHA-256.txt | sha256sum --check; \
   tar -xf cmake-3.7.2-Linux-x86_64.tar.gz -C /usr/local --strip-components=1; \
   rm cmake-3.7.2-*;
-
-ENV user ${user}
 
 # setup user
 RUN set -ex; \
