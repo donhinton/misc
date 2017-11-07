@@ -1,5 +1,8 @@
 # !/bin/bash
 
+# FIXME: Add parameter support, reduce duplication, and convert to
+# python.
+
 set -x
 
 ROOT_DIR=`pwd`
