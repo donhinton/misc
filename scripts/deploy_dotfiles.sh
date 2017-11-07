@@ -1,7 +1,7 @@
 # /bin/bash
 
-# Warning, this script is for bootstrapping a docker image, so we
-# don't working about saving old copies.  Use at your own risk.
+# Warning, this script is for bootstrapping user dot files in a docker
+# image.  Use at your own risk.
 
 OS=`uname`
 if [ "$OS" = "Linux" ]; then
