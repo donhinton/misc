@@ -5,8 +5,9 @@ FROM gcc:6
 # docker build [-t <name:tag>] --build-arg user=${USER} <path to dir containing this file>
 
 # In order to run gdb, you need to run this image like this:
-# Access <hostdir> as /home/${USER}/<containerdir> via the '-v' option
 # docker run [-v <hostdir>:/home/${USER}/<containerdir>] --privileged -it <image>
+
+# Access <hostdir> as /home/${USER}/<containerdir> via the '-v' option
 
 # Require "--build-arg user=<some user>" was passed.
 ARG user
@@ -62,9 +63,6 @@ RUN set -ex; \
 USER ${user}
 WORKDIR /home/${user}
 
-# FIXME: Break this out into it's own Dockerfile, so I can run build
-# with '--no-cache' for just the clang/llvm part
-# setup clang+llvm dev environment
 RUN set -ex; \
   git clone https://github.com/donhinton/misc.git; \
   misc/scripts/deploy_dotfiles.sh; \
