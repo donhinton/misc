@@ -35,7 +35,6 @@ RUN \
   apt-get -yqq upgrade; \
   apt-get -yqq install \
   sudo \
-  ninja-build \
   libedit-dev \
   python2.7-dev \
   curl \
@@ -47,13 +46,22 @@ RUN \
   #apt-get -yqq clean; \
   #rm -rf /var/lib/apt/lists/*; \
   \
-  curl -fSL https://cmake.org/files/v3.7/cmake-3.7.2-SHA-256.txt -o cmake-3.7.2-SHA-256.txt; \
-  curl -fSL https://cmake.org/files/v3.7/cmake-3.7.2-SHA-256.txt.asc -o cmake-3.7.2-SHA-256.txt.asc; \
-  curl -fSL https://cmake.org/files/v3.7/cmake-3.7.2-Linux-x86_64.tar.gz -o cmake-3.7.2-Linux-x86_64.tar.gz; \
-  gpg --verify cmake-3.7.2-SHA-256.txt.asc; \
-  grep cmake-3.7.2-Linux-x86_64.tar.gz cmake-3.7.2-SHA-256.txt | sha256sum --check; \
-  tar -xf cmake-3.7.2-Linux-x86_64.tar.gz -C /usr/local --strip-components=1; \
-  rm cmake-3.7.2-*;
+  curl -fSL https://cmake.org/files/v3.9/cmake-3.9.0-SHA-256.txt -o cmake-3.9.0-SHA-256.txt; \
+  curl -fSL https://cmake.org/files/v3.9/cmake-3.9.0-SHA-256.txt.asc -o cmake-3.9.0-SHA-256.txt.asc; \
+  curl -fSL https://cmake.org/files/v3.9/cmake-3.9.0-Linux-x86_64.tar.gz -o cmake-3.9.0-Linux-x86_64.tar.gz; \
+  gpg --verify cmake-3.9.0-SHA-256.txt.asc; \
+  grep cmake-3.9.0-Linux-x86_64.tar.gz cmake-3.9.0-SHA-256.txt | sha256sum --check; \
+  tar -xf cmake-3.9.0-Linux-x86_64.tar.gz -C /usr/local --strip-components=1; \
+  rm cmake-3.9.0-*;
+
+# apt-get version of ninja, 1.3.4, segfaults with certain llvm
+# configurations, so we build latest, 1.8.2.
+RUN \
+  set -ex; \
+  git clone git://github.com/ninja-build/ninja.git && cd ninja; \
+  git checkout release; \
+  ./configure.py --bootstrap; \
+  sudo cp ninja /usr/local/bin/
 
 # setup user
 RUN set -ex; \
