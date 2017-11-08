@@ -58,4 +58,5 @@ copy_file .emacs
 link_file .bashrc
 link_file .gitconfig
 link_file .tmux.conf
+link_file .gdbinit
 link_file site-lisp
