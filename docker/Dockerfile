@@ -35,6 +35,8 @@ RUN \
   apt-get -yqq upgrade; \
   apt-get -yqq install \
   sudo \
+  gcc-multilib \
+  g++-multilib \
   libedit-dev \
   python2.7-dev \
   curl \
