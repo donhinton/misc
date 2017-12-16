@@ -1,11 +1,15 @@
 #! /bin/bash
 
+# This script leverages docker to export a subset of the file system
+# needed to cross compile.
+
+# FIXME: Convert this to python, and incorporate the fix.py script
+# which fixes absolute symlinks.
+
 # example:
 # export.sh donhinton/dev_env
-# ls /tmp/docker/ubuntu
-
-# this cross compile like this...
-# PATH=/Users/dhinton/usr/bin:$PATH clang++ ~/x.cpp --sysroot=/tmp/docker/ubuntu -target x86_64-linux-gnu -fuse-ld=lld
+# then cross compile like this...
+# /Users/dhinton/usr/bin/clang++ ~/x.cpp --sysroot=/tmp/docker/ubuntu -target x86_64-linux-gnu -fuse-ld=lld
 
 DIRS="/usr/bin /usr/include /usr/lib /lib"
 HOST_DEST="/tmp/docker/ubuntu"
