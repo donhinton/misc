@@ -7,7 +7,7 @@
 # which fixes absolute symlinks.
 
 # example:
-# export.sh donhinton/dev_env
+# export_docker_filesystem.sh donhinton/dev_env
 # then cross compile like this...
 # /Users/dhinton/usr/bin/clang++ ~/x.cpp --sysroot=/tmp/docker/ubuntu -target x86_64-linux-gnu -fuse-ld=lld
 
@@ -32,9 +32,9 @@ if [ $# -eq 1 ]; then
   SRC_DIR="$( cd "$( dirname "$(${READLINK} -f "$0")" )" && pwd )"
   IMAGE=$1
   SCRIPTS_DIR=/tmp/`basename $SRC_DIR`
-  docker run -it -v $SRC_DIR:$SCRIPTS_DIR -v $HOST_DEST:$CONT_DEST $IMAGE $SCRIPTS_DIR/export.sh
+  docker run -it -v $SRC_DIR:$SCRIPTS_DIR -v $HOST_DEST:$CONT_DEST $IMAGE $SCRIPTS_DIR/export_docker_filesystem.sh
 
-	${SRC_DIR}/fix.py ${HOST_DEST} 
+  ${SRC_DIR}/fix_absolute_symlinks.py ${HOST_DEST}
 else
   
   cd $CONT_DEST
