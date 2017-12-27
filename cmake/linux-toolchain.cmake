@@ -3,6 +3,7 @@
 
 set(CMAKE_SYSTEM_NAME "Linux")
 
+# The sysroot tree was created via https://github.com/donhinton/misc/blob/master/scripts/export_docker_filesystem.sh
 set(sysroot "/tmp/docker/ubuntu")
 set(triple "x86_64-unknown-linux-gnu")
 set(flags "--sysroot=${sysroot} -target ${triple}")
