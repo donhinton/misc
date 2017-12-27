@@ -1,4 +1,5 @@
-
+# This toolchain file is intended to support cross compiling
+# clang+llvm for linux on Darwin.
 
 set(CMAKE_SYSTEM_NAME "Linux")
 
@@ -16,7 +17,8 @@ set(LIBCXX_CFLAGS "${flags}")
 set(CMAKE_REQUIRED_FLAGS "${flags}")
 set(CMAKE_REQUIRED_LIBRARIES "-fuse-ld=lld")
 
-# testing...
+# testing...  When we start using this for a multi-stage build, these
+# can be set to point to the first stage.
 # must use full path... ;-(
 #set(CLANG_TABLEGEN "/Users/dhinton/projects/llvm_project/build/Release/bin/clang-tblgen")
 #set(LLVM_TABLEGEN "/Users/dhinton/projects/llvm_project/build/Release/bin/llvm-tblgen")
