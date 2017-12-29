@@ -1,55 +1,75 @@
 # This toolchain file is intended to support cross compiling
 # clang+llvm for linux on Darwin.
 
-set(CMAKE_SYSTEM_NAME "Linux")
+if(NOT DEFINED TOOLCHAIN_FILE_LOADED)
+  message(STATUS "Loading toolchain file: ${CMAKE_CURRENT_LIST_FILE}.")
+  set(TOOLCHAIN_FILE_LOADED TRUE CACHE BOOL "")
 
-# The sysroot tree was created via https://github.com/donhinton/misc/blob/master/scripts/export_docker_filesystem.sh
-set(sysroot "/tmp/docker/ubuntu")
-set(triple "x86_64-unknown-linux-gnu")
-set(flags "--sysroot=${sysroot} -target ${triple}")
+  set(CMAKE_SYSTEM_NAME "Linux" CACHE STRING "")
 
-set(LLVM_DEFAULT_TARGET_TRIPLE "${triple}")
-set(LIBCXX_TARGET_TRIPLE "${triple}")
-set(LIBCXX_SYSROOT "${sysroot}")
+  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+  set(LLVM_ENABLE_PROJECTS "clang;libcxx;libcxxabi;libunwind;lld" CACHE STRING "" FORCE)
 
-set(LIBCXX_CFLAGS "${flags}")
+  set(CMAKE_C_COMPILER_FORCED TRUE CACHE BOOL "" FORCE)
+  set(CMAKE_C_COMPILER "clang")
 
-# These are needed/used for compiler tests, e.g., include files and flags.
-set(CMAKE_REQUIRED_FLAGS "${flags}")
-set(CMAKE_REQUIRED_LIBRARIES "-fuse-ld=lld")
+  set(CMAKE_CXX_COMPILER_FORCED TRUE CACHE BOOL "" FORCE)
+  set(CMAKE_CXX_COMPILER "clang++")
 
-# testing...  When we start using this for a multi-stage build, these
-# can be set to point to the first stage.
-# must use full path... ;-(
-#set(CLANG_TABLEGEN "/Users/dhinton/projects/llvm_project/build/Release/bin/clang-tblgen")
-#set(LLVM_TABLEGEN "/Users/dhinton/projects/llvm_project/build/Release/bin/llvm-tblgen")
-#set(_LLVM_CONFIG_EXE "/Users/dhinton/projects/llvm_project/build/Release/bin/llvm-config")
+  # The sysroot tree was created via https://github.com/donhinton/misc/blob/master/scripts/export_docker_filesystem.sh
+  set(sysroot "/tmp/docker/ubuntu")
+  set(triple "x86_64-unknown-linux-gnu")
+  set(flags "--sysroot=${sysroot} -target ${triple}")
+  set(link-flags "-fuse-ld=lld")
 
-set(CMAKE_C_COMPILER "clang")
-set(CMAKE_C_FLAGS "${flags}")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${flags}" CACHE STRING "")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${flags}" CACHE STRING "")
 
-set(CMAKE_CXX_COMPILER "clang++")
-set(CMAKE_CXX_FLAGS "${flags}")
+  set(LLVM_DEFAULT_TARGET_TRIPLE "${triple}" CACHE STRING "" FORCE)
 
-# Full path is required since PATH doesn't seem to propagate.
-find_program(CMAKE_RANLIB llvm-ranlib)
-find_program(CMAKE_AR llvm-ar)
+  set(LIBCXX_TARGET_TRIPLE "${triple}" CACHE STRING "" FORCE)
+  set(LIBCXX_SYSROOT "${sysroot}" CACHE STRING "" FORCE)
+  set(LIBCXX_CFLAGS "${flags}" CACHE STRING "" FORCE)
 
-set(CMAKE_STATIC_LINKER_FLAGS "-format gnu" CACHE STRING "")
+  # These are needed/used for compiler tests, e.g., include files and flags.
+  set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${flags}" CACHE STRING "" FORCE)
+  set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES} ${link-flags}" CACHE STRING "" FORCE)
 
-set(LLVM_ENABLE_LLD ON)
+  # testing...  When we start using this for a multi-stage build, these
+  # can be set to point to the first stage.
+  # must use full path... ;-(
+  #set(CLANG_TABLEGEN "/Users/dhinton/projects/llvm_project/build/Release/bin/clang-tblgen")
+  #set(LLVM_TABLEGEN "/Users/dhinton/projects/llvm_project/build/Release/bin/llvm-tblgen")
+  #set(_LLVM_CONFIG_EXE "/Users/dhinton/projects/llvm_project/build/Release/bin/llvm-config")
 
-set(LLVM_ENABLE_ZLIB OFF)
+  # Full path is required since PATH doesn't seem to propagate.
+  find_program(CMAKE_RANLIB llvm-ranlib)
+  find_program(CMAKE_AR llvm-ar)
 
-# Force gcc lookup at runtime -- otherwise Darwin will default to 4.2.1.
-set(GCC_INSTALL_PREFIX "/usr")
+  set(CMAKE_STATIC_LINKER_FLAGS "-format gnu" CACHE STRING "" FORCE)
 
-# Here is where the target environment located.
-SET(CMAKE_FIND_ROOT_PATH "${sysroot}")
+  set(LLVM_ENABLE_LLD ON CACHE STRING "" FORCE)
 
-# adjust the default behaviour of the FIND_XXX() commands:
-# search headers and libraries in the target environment, search 
-# programs in the host environment
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+  set(LLVM_ENABLE_ZLIB OFF CACHE BOOL "" FORCE)
+
+  # Force gcc lookup at runtime -- otherwise Darwin will default to 4.2.1.
+  set(GCC_INSTALL_PREFIX "/usr" CACHE STRING "" FORCE)
+
+  # Changing an RPATH from the build tree is not supported with the
+  # Ninja generator unless on an ELF-based platform.
+  if(CMAKE_HOST_APPLE AND CMAKE_GENERATOR STREQUAL "Ninja")
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON CACHE BOOL "" FORCE)
+  endif()
+
+
+  set(CMAKE_SYSTEM_PREFIX_PATH "${sysroot}" CACHE STRING "" FORCE)
+	# Here is where the target environment located.
+  SET(CMAKE_FIND_ROOT_PATH "${sysroot}" CACHE STRING "" FORCE)
+
+  # adjust the default behaviour of the FIND_XXX() commands:
+  # search headers and libraries in the target environment, search 
+  # programs in the host environment
+  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER CACHE STRING "" FORCE)
+  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY CACHE STRING "" FORCE)
+  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY CACHE STRING "" FORCE)
+endif()
