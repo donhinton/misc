@@ -28,6 +28,9 @@ if(NOT DEFINED TOOLCHAIN_FILE_LOADED)
   set(CMAKE_CXX_COMPILER_FORCED TRUE CACHE BOOL "" FORCE)
   set(CMAKE_CXX_COMPILER "clang++")
 
+  find_program(CMAKE_RANLIB llvm-ranlib)
+  find_program(CMAKE_AR llvm-ar)
+
   # The sysroot tree was created via https://github.com/donhinton/misc/blob/master/scripts/export_docker_filesystem.sh
   set(sysroot "/tmp/docker/ubuntu")
   set(triple "x86_64-unknown-linux-gnu")
@@ -47,16 +50,11 @@ if(NOT DEFINED TOOLCHAIN_FILE_LOADED)
   set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${flags}" CACHE STRING "" FORCE)
   set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES} ${link-flags}" CACHE STRING "" FORCE)
 
-  # testing...  When we start using this for a multi-stage build, these
-  # can be set to point to the first stage.
-  # must use full path... ;-(
-  #set(CLANG_TABLEGEN "/Users/dhinton/projects/llvm_project/build/Release/bin/clang-tblgen")
+  # When we start using this for a multi-stage build, these can be set
+  # to point to the first stage.  must use full path... ;-(
+	#set(CLANG_TABLEGEN "/Users/dhinton/projects/llvm_project/build/Release/bin/clang-tblgen")
   #set(LLVM_TABLEGEN "/Users/dhinton/projects/llvm_project/build/Release/bin/llvm-tblgen")
   #set(_LLVM_CONFIG_EXE "/Users/dhinton/projects/llvm_project/build/Release/bin/llvm-config")
-
-  # Full path is required since PATH doesn't seem to propagate.
-  find_program(CMAKE_RANLIB llvm-ranlib)
-  find_program(CMAKE_AR llvm-ar)
 
   set(CMAKE_STATIC_LINKER_FLAGS "-format gnu" CACHE STRING "" FORCE)
 
@@ -68,7 +66,8 @@ if(NOT DEFINED TOOLCHAIN_FILE_LOADED)
   set(GCC_INSTALL_PREFIX "/usr" CACHE STRING "" FORCE)
 
   # Changing an RPATH from the build tree is not supported with the
-  # Ninja generator unless on an ELF-based platform.
+  # Ninja generator unless on an ELF-based platform.  This might
+  # require changes to llvm cmake files at some point.
   if(CMAKE_HOST_APPLE AND CMAKE_GENERATOR STREQUAL "Ninja")
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON CACHE BOOL "" FORCE)
   endif()
