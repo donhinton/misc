@@ -22,6 +22,7 @@ if(NOT DEFINED TOOLCHAIN_FILE_LOADED)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
   set(LLVM_ENABLE_PROJECTS "clang;libcxx;libcxxabi;libunwind;lld" CACHE STRING "" FORCE)
 
+  # All of these can be set in stage1 and passed via BOOTSTRAP_ args.
   set(CMAKE_C_COMPILER_FORCED TRUE CACHE BOOL "" FORCE)
   set(CMAKE_C_COMPILER "clang")
 
@@ -30,6 +31,11 @@ if(NOT DEFINED TOOLCHAIN_FILE_LOADED)
 
   find_program(CMAKE_RANLIB llvm-ranlib)
   find_program(CMAKE_AR llvm-ar)
+  # When we start using this for a multi-stage build, these can be set
+  # to point to the first stage.
+  # find_program(CLANG_TABLEGEN clang-tblgen)
+  # find_program(LLVM_TABLEGEN llvm-tblgen)
+  # find_program(_LLVM_CONFIG_EXE llvm-config)
 
   # The sysroot tree was created via https://github.com/donhinton/misc/blob/master/scripts/export_docker_filesystem.sh
   set(sysroot "/tmp/docker/ubuntu")
@@ -50,12 +56,6 @@ if(NOT DEFINED TOOLCHAIN_FILE_LOADED)
   set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${flags}" CACHE STRING "" FORCE)
   set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES} ${link-flags}" CACHE STRING "" FORCE)
 
-  # When we start using this for a multi-stage build, these can be set
-  # to point to the first stage.  must use full path... ;-(
-  #set(CLANG_TABLEGEN "/Users/dhinton/projects/llvm_project/build/Release/bin/clang-tblgen")
-  #set(LLVM_TABLEGEN "/Users/dhinton/projects/llvm_project/build/Release/bin/llvm-tblgen")
-  #set(_LLVM_CONFIG_EXE "/Users/dhinton/projects/llvm_project/build/Release/bin/llvm-config")
-
   set(CMAKE_STATIC_LINKER_FLAGS "-format gnu" CACHE STRING "" FORCE)
 
   set(LLVM_ENABLE_LLD ON CACHE STRING "" FORCE)
@@ -74,7 +74,7 @@ if(NOT DEFINED TOOLCHAIN_FILE_LOADED)
 
 
   set(CMAKE_SYSTEM_PREFIX_PATH "${sysroot}" CACHE STRING "" FORCE)
-	# Here is where the target environment located.
+  # Here is where the target environment located.
   SET(CMAKE_FIND_ROOT_PATH "${sysroot}" CACHE STRING "" FORCE)
 
   # adjust the default behaviour of the FIND_XXX() commands:
