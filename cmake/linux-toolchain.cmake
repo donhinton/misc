@@ -1,6 +1,18 @@
 # This toolchain file is intended to support cross compiling
 # clang+llvm for linux on Darwin.
 
+# This file is a WIP, and is a preliminary step in creating a 2-stage
+# workflow.  Assuming clang+llvm+lld have already been built on
+# Darwin, it can be invoked like this:
+#
+# PATH=<prefix to prebuilt clang+llvm+lld>/bin:$PATH cmake -GNinja -DCMAKE_TOOLCHAIN_FILE=<path to this file>/linux-toolchain.cmake  ../../llvm
+#
+# Currently requires the following patches still under review:
+#   https://reviews.llvm.org/D41621
+#   https://reviews.llvm.org/D41622
+#   https://reviews.llvm.org/D41623
+#   https://gitlab.kitware.com/cmake/cmake/merge_requests/1620
+
 if(NOT DEFINED TOOLCHAIN_FILE_LOADED)
   message(STATUS "Loading toolchain file: ${CMAKE_CURRENT_LIST_FILE}.")
   set(TOOLCHAIN_FILE_LOADED TRUE CACHE BOOL "")
