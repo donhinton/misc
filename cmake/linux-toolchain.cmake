@@ -12,7 +12,7 @@
 # The sysroot tree was created via https://github.com/donhinton/misc/blob/master/scripts/export_docker_filesystem.sh
 
 if(NOT DEFINED SYSROOT AND NOT DEFINED CMAKE_SYSROOT)
-	message(FATAL_ERROR "Missing required option -DSYSROOT=<sysroot path>.")
+  message(FATAL_ERROR "Missing required option -DSYSROOT=<sysroot path>.")
 endif()
 
 if(DEFINED SYSROOT)
