@@ -12,10 +12,15 @@
 # /Users/dhinton/usr/bin/clang++ ~/x.cpp --sysroot=/tmp/docker/ubuntu -target x86_64-linux-gnu -fuse-ld=lld
 
 DIRS="/usr/bin /usr/include /usr/lib /lib"
-HOST_DEST="/tmp/docker/ubuntu"
 CONT_DEST="/tmp/ubuntu"
 
-if [ $# -eq 1 ]; then
+if [ $# -ge 1 ]; then
+
+  IMAGE=$1
+  HOST_DEST="/tmp/docker/ubuntu"
+  if [ $# -eq 2 ]; then
+    HOST_DEST=$2
+  fi
 
   OS=`uname`
   if [ "$OS" = "Linux" ]; then
@@ -30,7 +35,6 @@ if [ $# -eq 1 ]; then
   fi
 
   SRC_DIR="$( cd "$( dirname "$(${READLINK} -f "$0")" )" && pwd )"
-  IMAGE=$1
   SCRIPTS_DIR=/tmp/`basename $SRC_DIR`
   docker run -it -v $SRC_DIR:$SCRIPTS_DIR -v $HOST_DEST:$CONT_DEST $IMAGE $SCRIPTS_DIR/export_docker_filesystem.sh
 
