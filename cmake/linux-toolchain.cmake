@@ -47,98 +47,79 @@
 #       this relinking step.
 #
 
-if(NOT DEFINED SYSROOT AND NOT DEFINED CMAKE_SYSROOT)
-  message(FATAL_ERROR "Missing required option -DSYSROOT=<sysroot path>.")
+set(CMAKE_SYSTEM_NAME Linux CACHE STRING "" FORCE)
+
+if(NOT DEFINED CMAKE_C_COMPILER)
+  message(FATAL_ERROR "Missing required option -DCMAKE_C_COMPILER=<c compiler>.")
+endif()
+if(NOT DEFINED CMAKE_SYSROOT)
+  message(FATAL_ERROR "Missing required option -DCMAKE_SYSROOT=<sysroot path>.")
 endif()
 
-if(DEFINED SYSROOT)
-  # Since we just want to build a bootstrap compiler, turn off as much
-  # as possible.
-  set(LLVM_INCLUDE_DOCS OFF CACHE BOOL "")
-  set(LLVM_INCLUDE_EXAMPLES OFF CACHE BOOL "")
-  set(LLVM_INCLUDE_RUNTIMES OFF CACHE BOOL "")
-  set(LLVM_INCLUDE_TESTS OFF CACHE BOOL "")
-  set(LLVM_INCLUDE_UTILS OFF CACHE BOOL "")
-  set(CLANG_BUILD_TOOLS OFF CACHE BOOL "")
-  set(CLANG_ENABLE_ARCMT OFF CACHE BOOL "")
-  set(CLANG_ENABLE_STATIC_ANALYZER OFF CACHE BOOL "")
+# Allow overriding LLVM_ENABLE_PROJECTS.  This is useful when
+# bootstrapping since clang automatically fowards the
+# LLVM_ENABLE_PROJECTS used to compile the host tools.
+if(DEFINED LLVM_ENABLE_PROJECTS_OVERRIDE)
+  set(LLVM_ENABLE_PROJECTS "${LLVM_ENABLE_PROJECTS_OVERRIDE}" CACHE STRING "" FORCE)
+endif()
 
-  set(LLVM_TARGETS_TO_BUILD Native CACHE STRING "")
-  set(CMAKE_BUILD_TYPE RELEASE CACHE STRING "")
-  set(LLVM_ENABLE_ASSERTIONS ON CACHE BOOL "")
+# Set default, but allow overries.
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "")
+endif()
 
-  # Make sure at least clang and lld are included.
-  list(APPEND LLVM_ENABLE_PROJECTS clang lld)
-  set(LLVM_ENABLE_PROJECTS ${LLVM_ENABLE_PROJECTS} CACHE STRING "")
+if(NOT DEFINED LLVM_DEFAULT_TARGET_TRIPLE)
+  set(LLVM_DEFAULT_TARGET_TRIPLE "x86_64-unknown-linux-gnu" CACHE STRING "")
+endif()
 
-  # Passing -fuse-ld=lld is hard for cmake to handle correctly, so
-  # make lld the default linker.
-  set(CLANG_DEFAULT_LINKER lld CACHE STRING "" FORCE)
+set(CMAKE_C_COMPILER_TARGET "${LLVM_DEFAULT_TARGET_TRIPLE}" CACHE STRING "")
+set(CMAKE_CXX_COMPILER_TARGET "${LLVM_DEFAULT_TARGET_TRIPLE}" CACHE STRING "")
 
-  # Since LLVM_ENABLE_PROJECTS gets passed automatically to the next
-  # stage, use another variable to pass the desired projects to stage2.
-  if(DEFINED BOOTSTRAP_LLVM_ENABLE_PROJECTS)
-    set(BOOTSTRAP_STAGE2_PROJECTS ${BOOTSTRAP_LLVM_ENABLE_PROJECTS} CACHE STRING "" FORCE)
-    unset(BOOTSTRAP_LLVM_ENABLE_PROJECTS CACHE)
-  else()
-    set(BOOTSTRAP_STAGE2_PROJECTS "clang;libcxx;libcxxabi;libunwind" CACHE STRING "" FORCE)
-  endif()
-
-  if(NOT DEFINED TRIPLE)
-    set(TRIPLE "x86_64-unknown-linux-gnu")
-  endif()
-
-  set(BOOTSTRAP_LLVM_ENABLE_LLD ON CACHE BOOL "")
-
-  set(CLANG_ENABLE_BOOTSTRAP ON CACHE BOOL "")
-  set(CLANG_BOOTSTRAP_CMAKE_ARGS
-    -DCMAKE_SYSROOT=${SYSROOT}
-    -DLLVM_DEFAULT_TARGET_TRIPLE=${TRIPLE}
-    -DCMAKE_C_COMPILER_TARGET=${TRIPLE}
-    -DCMAKE_CXX_COMPILER_TARGET=${TRIPLE}
-    -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_LIST_FILE}
-		CACHE STRING "")
-else()
-  set(CMAKE_SYSTEM_NAME Linux CACHE STRING "" FORCE)
-
-  # Set default, but allow overries.
-  if(NOT DEFINED CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "")
-  endif()
-
-  # Always use STAGE2_PROJECTS Use FORCE to override passed vaiable.
-  set(LLVM_ENABLE_PROJECTS ${STAGE2_PROJECTS} CACHE STRING "" FORCE)
-
-  # Use bootstrap tools.
-  get_filename_component(BASE_PATH "${CMAKE_C_COMPILER}" DIRECTORY CACHE)
+# Use bootstrap tools.
+get_filename_component(BASE_PATH "${CMAKE_C_COMPILER}" DIRECTORY CACHE)
+if(NOT DEFINED CMAKE_AR)
   set(CMAKE_AR "${BASE_PATH}/llvm-ar" CACHE STRING "")
+endif()
+if(NOT DEFINED CMAKE_RANLIB)
   set(CMAKE_RANLIB "${BASE_PATH}/llvm-ranlib" CACHE STRING "")
-  set(CLANG_TABLEGEN "${BASE_PATH}/clang-tblgen" CACHE STRING "")
-  set(LLVM_TABLEGEN "${BASE_PATH}/llvm-tblgen" CACHE STRING "")
-  set(_LLVM_CONFIG_EXE "${BASE_PATH}/llvm-config" CACHE STRING "")
-  set(CMAKE_LINKER "${BASE_PATH}/lld" CACHE STRING "")
+endif()
 
+if(FALSE)
+  if(NOT DEFINED CLANG_TABLEGEN)
+    set(CLANG_TABLEGEN "${BASE_PATH}/clang-tblgen" CACHE STRING "")
+  endif()
+  if(NOT DEFINED LLVM_TABLEGEN)
+    set(LLVM_TABLEGEN "${BASE_PATH}/llvm-tblgen" CACHE STRING "")
+  endif()
+  if(NOT DEFINED _LLVM_CONFIG_EXE)
+    set(_LLVM_CONFIG_EXE "${BASE_PATH}/llvm-config" CACHE STRING "")
+  endif()
+endif()
+
+if(NOT DEFINED CMAKE_STATIC_LINKER_FLAGS)
   # Make sure static libs use the gnu format.
   set(CMAKE_STATIC_LINKER_FLAGS "-format gnu" CACHE STRING "")
-
-  # Force clang to look for gcc at runtime -- otherwise it will
-  # default to 4.2.1.
-  set(GCC_INSTALL_PREFIX "/usr" CACHE STRING "")
-
-  # Changing an RPATH from the build tree is not supported with the
-  # Ninja generator unless on an ELF-based platform.  This might
-  # require changes to llvm cmake files at some point.
-  if(CMAKE_HOST_APPLE AND CMAKE_GENERATOR STREQUAL "Ninja")
-    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON CACHE BOOL "")
-  endif()
-
-  # Use CMAKE_SYSROOT prefix for FIND_XXX() commands.
-  SET(CMAKE_FIND_ROOT_PATH "${CMAKE_SYSROOT}" CACHE STRING "")
-
-  # Adjust the default behaviour of the FIND_XXX() commands:
-  # search headers and libraries in the target environment, search
-  # programs in the host environment.
-  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER CACHE STRING "")
-  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY CACHE STRING "")
-  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY CACHE STRING "")
 endif()
+
+# Force clang to look for gcc at runtime -- otherwise it will
+# default to 4.2.1.
+if(NOT DEFINED GCC_INSTALL_PREFIX)
+  set(GCC_INSTALL_PREFIX "/usr" CACHE STRING "")
+endif()
+
+# Changing an RPATH from the build tree is not supported with the
+# Ninja generator unless on an ELF-based platform.  This might
+# require changes to llvm cmake files at some point.
+if(CMAKE_HOST_APPLE AND CMAKE_GENERATOR STREQUAL "Ninja")
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH ON CACHE BOOL "")
+endif()
+
+# Use CMAKE_SYSROOT prefix for FIND_XXX() commands.
+SET(CMAKE_FIND_ROOT_PATH "${CMAKE_SYSROOT}" CACHE STRING "")
+
+# Adjust the default behaviour of the FIND_XXX() commands:
+# search headers and libraries in the target environment, search
+# programs in the host environment.
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER CACHE STRING "")
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY CACHE STRING "")
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY CACHE STRING "")
