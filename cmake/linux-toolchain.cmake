@@ -98,27 +98,30 @@ if(NOT DEFINED GCC_INSTALL_PREFIX)
   set(GCC_INSTALL_PREFIX "/usr" CACHE STRING "")
 endif()
 
+# If the Host is Apple, we need to use the llvm tools, since the apple
+# ones don't support elf.
 if(CMAKE_HOST_APPLE)
 
-  # FIXME: What if the path isn't included?
-  get_filename_component(BASE_PATH "${CMAKE_C_COMPILER}" DIRECTORY CACHE)
-  # If the Host is Apple, we need to use the llvm tools.
+  # Need to use PROGRAM first just in case CMAKE_C_COMPILER doesn't
+  # include a path.
+  get_filename_component(c_compiler "${CMAKE_C_COMPILER}" PROGRAM)
+  get_filename_component(base_path "${c_compiler}" DIRECTORY)
   if(NOT DEFINED CMAKE_AR)
-    set(CMAKE_AR "${BASE_PATH}/llvm-ar" CACHE STRING "")
+    set(CMAKE_AR "${base_path}/llvm-ar" CACHE STRING "")
   endif()
   if(NOT DEFINED CMAKE_RANLIB)
-    set(CMAKE_RANLIB "${BASE_PATH}/llvm-ranlib" CACHE STRING "")
+    set(CMAKE_RANLIB "${base_path}/llvm-ranlib" CACHE STRING "")
   endif()
 
   # FIXME: Should these go here, or just rely on them being passed?
   if(NOT DEFINED CLANG_TABLEGEN)
-    set(CLANG_TABLEGEN "${BASE_PATH}/clang-tblgen" CACHE STRING "")
+    set(CLANG_TABLEGEN "${base_path}/clang-tblgen" CACHE STRING "")
   endif()
   if(NOT DEFINED LLVM_TABLEGEN)
-    set(LLVM_TABLEGEN "${BASE_PATH}/llvm-tblgen" CACHE STRING "")
+    set(LLVM_TABLEGEN "${base_path}/llvm-tblgen" CACHE STRING "")
   endif()
   if(NOT DEFINED _LLVM_CONFIG_EXE)
-    set(_LLVM_CONFIG_EXE "${BASE_PATH}/llvm-config" CACHE STRING "")
+    set(_LLVM_CONFIG_EXE "${base_path}/llvm-config" CACHE STRING "")
   endif()
 
 
