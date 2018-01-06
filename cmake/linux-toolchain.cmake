@@ -1,16 +1,23 @@
 # This file is intended to support cross compiling a linux toolchain
 # on any host system, includind Darwin.
 #
-# Usage: cmake -GNinja -DSYSROOT=<path> [OPTIONS] -C ../clang/cmake/caches/linux-toolchain.cmake  ../llvm
+# Usage: cmake -GNinja -DCMAKE_C_COMPILER=<c compiler> -DCMAKE_SYSROOT=<path> [OPTIONS] -DCMAKE_TOOLCHAIN_FILE=linux-toolchain.cmake  ../llvm
 #
-#   OPTIONS:
-#     Regular options apply to stage1.
-#     BOOTSTRAP_ options apply to stage2, and should use the BOOTSTRAP_ prefix.
+#  Common options with (default):
 #
-# Then run "ninja stage2" to cross compile.  Bins and libs can be
-# found in tools/clang/stage2-bins.
-#
-# Known issues:
+#    FIXME: reorganize these and add more info.
+#    CMAKE_BUILD_TYPE (Release)
+#    CMAKE_AR
+#    CMAKE_RANLIB
+#    GCC_INSTALL_PREFIX ("/usr")
+#    LLVM_DEFAULT_TARGET_TRIPLE ("x86_64-unknown-linux-gnu")
+#    LLVM_ENABLE_PROJECTS
+#    LLVM_ENABLE_PROJECTS_OVERRIDE -- used to override
+#      LLVM_ENABLE_PROJECTS when bootstrapping, which is passed
+#      automatically.
+#    CLANG_TABLEGEN
+#    LLVM_TABLEGEN
+#    _LLVM_CONFIG_EXE
 #
 #  1) This toolchain assumes a flat, mono-repo layout.
 #
@@ -31,12 +38,7 @@
 #       projects/compiler-rt/lib/sanitizer_common/CMakeFiles/RTSanitizerCommon.x86_64.dir/sanitizer_linux_x86_64.S.o:
 #       invalid data encoding
 #
-#  4) FIND_PACKAGE can fail if the package file uses PkgConfig, e.g.,
-#     FindLibXml2.cmake, since the pkg-config program runs on the
-#     host, and the variables set by PKG_CHECK_MODULES reference the
-#     host system, not the target.
-#
-#  5) Stage2 configuration fails for several sub-projects, including
+#  4) Stage2 configuration fails for several sub-projects, including
 #     libcxx, libcxxabi, and libunwind, with the following error:
 #
 #       CMake Error at .../llvm_project/libunwind/src/CMakeLists.txt:110 (add_library):
@@ -46,9 +48,16 @@
 #       CMAKE_BUILD_WITH_INSTALL_RPATH variable may be set to avoid
 #       this relinking step.
 #
+#  5) Passing _LLVM_CONFIG_EXE requires a patch.
+#
 
 set(CMAKE_SYSTEM_NAME Linux CACHE STRING "" FORCE)
 
+#
+# Required arguments.
+#
+
+# Cmake sets CMAKE_CXX_COMPILER sets automatically based on CMAKE_C_COMPILER.
 if(NOT DEFINED CMAKE_C_COMPILER)
   message(FATAL_ERROR "Missing required option -DCMAKE_C_COMPILER=<c compiler>.")
 endif()
@@ -56,14 +65,15 @@ if(NOT DEFINED CMAKE_SYSROOT)
   message(FATAL_ERROR "Missing required option -DCMAKE_SYSROOT=<sysroot path>.")
 endif()
 
-# Allow overriding LLVM_ENABLE_PROJECTS.  This is useful when
-# bootstrapping since clang automatically fowards the
-# LLVM_ENABLE_PROJECTS used to compile the host tools.
-if(DEFINED LLVM_ENABLE_PROJECTS_OVERRIDE)
-  set(LLVM_ENABLE_PROJECTS "${LLVM_ENABLE_PROJECTS_OVERRIDE}" CACHE STRING "" FORCE)
-endif()
+#
+# Optional arguments.
+#
 
 # Set default, but allow overries.
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "")
+endif()
+
 if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "")
 endif()
@@ -75,16 +85,32 @@ endif()
 set(CMAKE_C_COMPILER_TARGET "${LLVM_DEFAULT_TARGET_TRIPLE}" CACHE STRING "")
 set(CMAKE_CXX_COMPILER_TARGET "${LLVM_DEFAULT_TARGET_TRIPLE}" CACHE STRING "")
 
-# Use bootstrap tools.
-get_filename_component(BASE_PATH "${CMAKE_C_COMPILER}" DIRECTORY CACHE)
-if(NOT DEFINED CMAKE_AR)
-  set(CMAKE_AR "${BASE_PATH}/llvm-ar" CACHE STRING "")
-endif()
-if(NOT DEFINED CMAKE_RANLIB)
-  set(CMAKE_RANLIB "${BASE_PATH}/llvm-ranlib" CACHE STRING "")
+# Allow overriding LLVM_ENABLE_PROJECTS.  This is useful when
+# bootstrapping since clang automatically fowards the
+# LLVM_ENABLE_PROJECTS used to compile the host tools.
+if(DEFINED LLVM_ENABLE_PROJECTS_OVERRIDE)
+  set(LLVM_ENABLE_PROJECTS "${LLVM_ENABLE_PROJECTS_OVERRIDE}" CACHE STRING "" FORCE)
 endif()
 
-if(FALSE)
+# Force clang to look for gcc at runtime -- otherwise it will
+# default to 4.2.1.
+if(NOT DEFINED GCC_INSTALL_PREFIX)
+  set(GCC_INSTALL_PREFIX "/usr" CACHE STRING "")
+endif()
+
+if(CMAKE_HOST_APPLE)
+
+  # FIXME: What if the path isn't included?
+  get_filename_component(BASE_PATH "${CMAKE_C_COMPILER}" DIRECTORY CACHE)
+  # If the Host is Apple, we need to use the llvm tools.
+  if(NOT DEFINED CMAKE_AR)
+    set(CMAKE_AR "${BASE_PATH}/llvm-ar" CACHE STRING "")
+  endif()
+  if(NOT DEFINED CMAKE_RANLIB)
+    set(CMAKE_RANLIB "${BASE_PATH}/llvm-ranlib" CACHE STRING "")
+  endif()
+
+  # FIXME: Should these go here, or just rely on them being passed?
   if(NOT DEFINED CLANG_TABLEGEN)
     set(CLANG_TABLEGEN "${BASE_PATH}/clang-tblgen" CACHE STRING "")
   endif()
@@ -94,24 +120,17 @@ if(FALSE)
   if(NOT DEFINED _LLVM_CONFIG_EXE)
     set(_LLVM_CONFIG_EXE "${BASE_PATH}/llvm-config" CACHE STRING "")
   endif()
-endif()
 
-if(NOT DEFINED CMAKE_STATIC_LINKER_FLAGS)
+
   # Make sure static libs use the gnu format.
   set(CMAKE_STATIC_LINKER_FLAGS "-format gnu" CACHE STRING "")
-endif()
 
-# Force clang to look for gcc at runtime -- otherwise it will
-# default to 4.2.1.
-if(NOT DEFINED GCC_INSTALL_PREFIX)
-  set(GCC_INSTALL_PREFIX "/usr" CACHE STRING "")
-endif()
-
-# Changing an RPATH from the build tree is not supported with the
-# Ninja generator unless on an ELF-based platform.  This might
-# require changes to llvm cmake files at some point.
-if(CMAKE_HOST_APPLE AND CMAKE_GENERATOR STREQUAL "Ninja")
-  set(CMAKE_BUILD_WITH_INSTALL_RPATH ON CACHE BOOL "")
+  # Changing an RPATH from the build tree is not supported with the
+  # Ninja generator unless on an ELF-based platform.  This might
+  # require changes to llvm cmake files at some point.
+  if(CMAKE_GENERATOR STREQUAL "Ninja")
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON CACHE BOOL "")
+  endif()
 endif()
 
 # Use CMAKE_SYSROOT prefix for FIND_XXX() commands.
