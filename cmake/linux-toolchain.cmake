@@ -17,7 +17,6 @@
 #      automatically.
 #    CLANG_TABLEGEN
 #    LLVM_TABLEGEN
-#    _LLVM_CONFIG_EXE
 #
 #  1) This toolchain assumes a flat, mono-repo layout.
 #
