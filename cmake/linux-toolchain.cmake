@@ -101,7 +101,6 @@ endif()
 # If the Host is Apple, we need to use the llvm tools, since the apple
 # ones don't support elf.
 if(CMAKE_HOST_APPLE)
-
   # Need to use PROGRAM first just in case CMAKE_C_COMPILER doesn't
   # include a path.
   get_filename_component(c_compiler "${CMAKE_C_COMPILER}" PROGRAM)
@@ -120,10 +119,6 @@ if(CMAKE_HOST_APPLE)
   if(NOT DEFINED LLVM_TABLEGEN)
     set(LLVM_TABLEGEN "${base_path}/llvm-tblgen" CACHE STRING "")
   endif()
-  if(NOT DEFINED _LLVM_CONFIG_EXE)
-    set(_LLVM_CONFIG_EXE "${base_path}/llvm-config" CACHE STRING "")
-  endif()
-
 
   # Make sure static libs use the gnu format.
   set(CMAKE_STATIC_LINKER_FLAGS "-format gnu" CACHE STRING "")
