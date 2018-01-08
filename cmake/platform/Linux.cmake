@@ -18,6 +18,8 @@
 #    CLANG_TABLEGEN
 #    LLVM_TABLEGEN
 #
+# Known issues:
+#
 #  1) This toolchain assumes a flat, mono-repo layout.
 #
 #  2) Several sub-projects, including libcxx, libcxxabi, and
