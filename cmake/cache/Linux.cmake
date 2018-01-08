@@ -1,3 +1,10 @@
+# This file is primarily for cross compiling clang+llvm, et al, for
+# Linux on Darwin, and can be invoked like this:
+#
+#  cmake -GNinja -DBOOTSTRAP_CMAKE_SYSROOT=<path> [OPTIONS] \
+#    -DBOOTSTRAP_CMAKE_TOOLCHAIN_FILE=<llvm root>/cmake/platforms/linux-toolchain.cmake \
+#    -C <clang root>/cmake/caches/Linux.cmake ../llvm
+
 if(NOT DEFINED BOOTSTRAP_CMAKE_SYSROOT)
   message(SEND_ERROR "Missing required argument -DBOOTSTRAP_CMAKE_SYSROOT=<sysroot path>.")
 endif()

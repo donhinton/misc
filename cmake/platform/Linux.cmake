@@ -4,13 +4,12 @@
 # It is normally invoked as part of a 2-stage cross compilation using
 # clang/cmake/caches/Linux.cmake:
 #
-#  cmake -GNinja -DCMAKE_SYSROOT=<path> [OPTIONS] \
-#    -DCMAKE_TOOLCHAIN_FILE=<llvm root>/cmake/platforms/linux-toolchain.cmake \
+#  cmake -GNinja -DBOOTSTRAP_CMAKE_SYSROOT=<path> [OPTIONS] \
+#    -DBOOTSTRAP_CMAKE_TOOLCHAIN_FILE=<llvm root>/cmake/platforms/linux-toolchain.cmake \
 #    -C <clang root>/cmake/caches/Linux.cmake ../llvm
 #
 #  Common options (default):
 #
-#    FIXME: reorganize these and add more info.
 #    CMAKE_BUILD_TYPE (Release)
 #    CMAKE_AR
 #    CMAKE_RANLIB
