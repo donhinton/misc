@@ -1,9 +1,14 @@
 # This file is intended to support cross compiling a linux toolchain
 # on any host system, includind Darwin.
 #
-# Usage: cmake -GNinja -DCMAKE_C_COMPILER=<c compiler> -DCMAKE_SYSROOT=<path> [OPTIONS] -DCMAKE_TOOLCHAIN_FILE=linux-toolchain.cmake  ../llvm
+# It is normally invoked as part of a 2-stage cross compilation using
+# clang/cmake/caches/Linux.cmake:
 #
-#  Common options with (default):
+#  cmake -GNinja -DCMAKE_SYSROOT=<path> [OPTIONS] \
+#    -DCMAKE_TOOLCHAIN_FILE=<llvm root>/cmake/platforms/linux-toolchain.cmake \
+#    -C <clang root>/cmake/caches/Linux.cmake ../llvm
+#
+#  Common options (default):
 #
 #    FIXME: reorganize these and add more info.
 #    CMAKE_BUILD_TYPE (Release)
