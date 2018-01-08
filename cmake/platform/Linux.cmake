@@ -47,6 +47,17 @@
 #       CMAKE_BUILD_WITH_INSTALL_RPATH variable may be set to avoid
 #       this relinking step.
 #
+#  5) To link elf binaries on Darwin, it's necessary to pass
+#     CLANG_DEFAULT_LINKER=lld when building the stage1 compiler.
+#     Unfortunately, a bug in lld means that ld64.lld fails to link,
+#     causing the Native tools configuration to fail as well.
+#
+#     In order to prevent this, it is necessary to pass CLANG_TABLEGEN
+#     and LLVM_TABLEGEN, as well as apply the following patch to
+#     remove the _LLVM_CONFIG_EXE logic:
+#
+#       https://reviews.llvm.org/D41806
+#
 
 set(CMAKE_SYSTEM_NAME Linux CACHE STRING "" FORCE)
 
