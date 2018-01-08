@@ -47,8 +47,6 @@
 #       CMAKE_BUILD_WITH_INSTALL_RPATH variable may be set to avoid
 #       this relinking step.
 #
-#  5) Passing _LLVM_CONFIG_EXE requires a patch.
-#
 
 set(CMAKE_SYSTEM_NAME Linux CACHE STRING "" FORCE)
 
@@ -56,10 +54,6 @@ set(CMAKE_SYSTEM_NAME Linux CACHE STRING "" FORCE)
 # Required arguments.
 #
 
-# Cmake sets CMAKE_CXX_COMPILER sets automatically based on CMAKE_C_COMPILER.
-if(NOT DEFINED CMAKE_C_COMPILER)
-  message(FATAL_ERROR "Missing required option -DCMAKE_C_COMPILER=<c compiler>.")
-endif()
 if(NOT DEFINED CMAKE_SYSROOT)
   message(FATAL_ERROR "Missing required option -DCMAKE_SYSROOT=<sysroot path>.")
 endif()
@@ -69,10 +63,6 @@ endif()
 #
 
 # Set default, but allow overries.
-if(NOT DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "")
-endif()
-
 if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "")
 endif()
@@ -97,28 +87,7 @@ if(NOT DEFINED GCC_INSTALL_PREFIX)
   set(GCC_INSTALL_PREFIX "/usr" CACHE STRING "")
 endif()
 
-# If the Host is Apple, we need to use the llvm tools, since the apple
-# ones don't support elf.
 if(CMAKE_HOST_APPLE)
-  # Need to use PROGRAM first just in case CMAKE_C_COMPILER doesn't
-  # include a path.
-  get_filename_component(c_compiler "${CMAKE_C_COMPILER}" PROGRAM)
-  get_filename_component(base_path "${c_compiler}" DIRECTORY)
-  if(NOT DEFINED CMAKE_AR)
-    set(CMAKE_AR "${base_path}/llvm-ar" CACHE STRING "")
-  endif()
-  if(NOT DEFINED CMAKE_RANLIB)
-    set(CMAKE_RANLIB "${base_path}/llvm-ranlib" CACHE STRING "")
-  endif()
-
-  # FIXME: Should these go here, or just rely on them being passed?
-  if(NOT DEFINED CLANG_TABLEGEN)
-    set(CLANG_TABLEGEN "${base_path}/clang-tblgen" CACHE STRING "")
-  endif()
-  if(NOT DEFINED LLVM_TABLEGEN)
-    set(LLVM_TABLEGEN "${base_path}/llvm-tblgen" CACHE STRING "")
-  endif()
-
   # Make sure static libs use the gnu format.
   set(CMAKE_STATIC_LINKER_FLAGS "-format gnu" CACHE STRING "")
 
@@ -127,7 +96,7 @@ if(CMAKE_HOST_APPLE)
   # require changes to llvm cmake files at some point.
   if(CMAKE_GENERATOR STREQUAL "Ninja")
     set(CMAKE_BUILD_WITH_INSTALL_RPATH ON CACHE BOOL "")
-  endif()
+  endif() 
 endif()
 
 # Use CMAKE_SYSROOT prefix for FIND_XXX() commands.
