@@ -81,13 +81,15 @@ if(CMAKE_HOST_APPLE)
   set(CLANG_DEFAULT_OBJCOPY llvm-objcopy CACHE STRING "")
 
   list(APPEND EXTRA_ARGS
+    # FIXME: Libfuzzer won't build correctly, so turn off for now.
+    -DBOOTSTRAP_COMPILER_RT_BUILD_LIBFUZZER=OFF
     -DLLVM_ENABLE_LLD=ON
     -DCMAKE_AR=${CMAKE_BINARY_DIR}/bin/llvm-ar
     -DCMAKE_OBJCOPY=${CMAKE_BINARY_DIR}/bin/llvm-objcopy
     -DCMAKE_RANLIB=${CMAKE_BINARY_DIR}/bin/llvm-ranlib
     -DCLANG_TABLEGEN=${CMAKE_BINARY_DIR}/bin/clang-tblgen
     -DLLVM_TABLEGEN=${CMAKE_BINARY_DIR}/bin/llvm-tblgen
-    -DLLVM_CONFIG_EXE=${CMAKE_BINARY_DIR}/bin/llvm-config
+    -DLLVM_CONFIG_PATH=${CMAKE_BINARY_DIR}/bin/llvm-config
     )
 
 endif()
