@@ -1,5 +1,7 @@
 # !/bin/bash
 
+# FIXME: Convert to python and refactor common coded into functions.
+
 set -x
 
 ROOT_DIR=`pwd`
