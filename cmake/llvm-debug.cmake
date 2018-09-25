@@ -1,11 +1,15 @@
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "")
 set(LLVM_OPTIMIZED_TABLEGEN ON CACHE BOOL "")
 
-set(LLVM_ENABLE_PROJECTS clang lld libcxx libcxxabi libunwind compiler-rt CACHE STRING "")
+set(LLVM_APPEND_VC_REV OFF CACHE BOOL "")
+
+#set(LLVM_ENABLE_PROJECTS clang  CACHE STRING "")
+#set(LLVM_ENABLE_PROJECTS clang lld libcxx libcxxabi libunwind compiler-rt CACHE STRING "")
+set(LLVM_ENABLE_PROJECTS clang libcxx libcxxabi libunwind CACHE STRING "")
 set(LLVM_TARGETS_TO_BUILD "X86" CACHE STRING "")
 
-set(BUILD_SHARED_LIBS ON CACHE BOOL "")
-set(LLVM_USE_SPLIT_DWARF ON CACHE BOOL "")
+#set(BUILD_SHARED_LIBS ON CACHE BOOL "")
+#set(LLVM_USE_SPLIT_DWARF ON CACHE BOOL "")
 
 set(LLVM_LIT_ARGS '-v' CACHE STRING "")
 
