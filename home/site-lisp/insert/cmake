@@ -63,7 +63,7 @@ if(CMAKE_GENERATOR STREQUAL "Ninja")
     endif()
 
     if("${NINJA_VERSION}" VERSION_EQUAL "1.9.0" AND
-        NOT "${NINJA_VERISON}" STREQUAL "1.9.0.git-fork")
+        NOT "${NINJA_VERSION}" STREQUAL "1.9.0.git-fork")
       message(WARNING "This verison of Ninja reruns cmake "
         "unnecessarily after each reconfig.  To solve this problem, "
         "use the patched version found here: "
