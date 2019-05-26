@@ -9,8 +9,6 @@ cmake_minimum_required(VERSION 3.4.3)
 #	[VERSION <major>[.<minor>[.<patch>[.<tweak>]]]]
 #	[LANGUAGES <language-name>...])
 
-#cmake_policy(SET CMP0068 NEW)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # We need C++ 11
