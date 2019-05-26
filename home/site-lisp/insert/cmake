@@ -49,18 +49,27 @@ if(CMAKE_GENERATOR STREQUAL "Ninja")
   endif()
 endif()
 
+# Handle ninja problems
 if(CMAKE_GENERATOR STREQUAL "Ninja")
   execute_process(COMMAND ${CMAKE_MAKE_PROGRAM} --version
     OUTPUT_VARIABLE NINJA_VERSION
     OUTPUT_STRIP_TRAILING_WHITESPACE)
   set(NINJA_VERSION ${NINJA_VERSION} CACHE STRING "Ninja version number" FORCE)
   message(STATUS "Ninja version: ${NINJA_VERSION}")
-endif()
 
-if(CMAKE_GENERATOR STREQUAL "Ninja" AND
-    NOT "${NINJA_VERSION}" VERSION_LESS "1.9.0" AND
-    CMAKE_HOST_APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_GREATER "15.6.0")
-  set(TOUCH_STATIC_LIBRARIES ON)
+  if(NOT "${NINJA_VERSION}" VERSION_LESS "1.9.0")
+    if(CMAKE_HOST_APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_GREATER "15.6.0")
+      set(TOUCH_STATIC_LIBRARIES ON)
+    endif()
+
+    if("${NINJA_VERSION}" VERSION_EQUAL "1.9.0" AND
+        NOT "${NINJA_VERISON}" STREQUAL "1.9.0.git-fork")
+      message(WARNING "This verison of Ninja reruns cmake "
+        "unnecessarily after each reconfig.  To solve this problem, "
+        "use the patched version found here: "
+        "https://github.com/donhinton/ninja")
+    endif()
+  endif()
 endif()
 
 function(update_compile_flags name)
