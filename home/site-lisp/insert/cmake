@@ -2,12 +2,14 @@
 
 ################################################################################
 # Top level Start
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.4.3)
 
 #project(
 #  <PROJECT-NAME>
 #	[VERSION <major>[.<minor>[.<patch>[.<tweak>]]]]
 #	[LANGUAGES <language-name>...])
+
+#cmake_policy(SET CMP0068 NEW)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -21,53 +23,78 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Make Debug the default, pass -DCMAKE_BUILD_TYPE=Release to change this.
 if (NOT CMAKE_BUILD_TYPE)
-	message ("Setting CMAKE_BUILD_TYPE = Debug")
-	set(CMAKE_BUILD_TYPE Debug)
+  message (STATUS "Setting CMAKE_BUILD_TYPE = Debug")
+  set(CMAKE_BUILD_TYPE Debug)
 endif()
 
-# enable CTest
-#enable_testing()
+if(NOT APPLE)
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+  set(CMAKE_INSTALL_RPATH "\${ORIGIN}/../lib")
+endif()
+
+if(CMAKE_CROSSCOMPILING)
+  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+endif()
+
+# We need this so ninja will display color diagnostics.
+if(CMAKE_GENERATOR STREQUAL "Ninja")
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
+  elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    if(NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.9")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fdiagnostics-color=always")
+    endif()
+  endif()
+endif()
+
+if(CMAKE_GENERATOR STREQUAL "Ninja")
+  execute_process(COMMAND ${CMAKE_MAKE_PROGRAM} --version
+    OUTPUT_VARIABLE NINJA_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set(NINJA_VERSION ${NINJA_VERSION} CACHE STRING "Ninja version number" FORCE)
+  message(STATUS "Ninja version: ${NINJA_VERSION}")
+endif()
+
+if(CMAKE_GENERATOR STREQUAL "Ninja" AND
+    NOT "${NINJA_VERSION}" VERSION_LESS "1.9.0" AND
+    CMAKE_HOST_APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_GREATER "15.6.0")
+  set(TOUCH_STATIC_LIBRARIES ON)
+endif()
+
+function(update_compile_flags name)
+  # clang and newer versions of ninja use high-resolutions timestamps,
+  # but older versions of libtool on Darwin don't, so the archive will
+  # often get an older timestamp than the last object that was added
+  # or updated.  To fix this, we add a custom command to touch archive
+  # after it's been built so that ninja won't rebuild it unnecessarily
+  # the next time it's run.
+  if(TOUCH_STATIC_LIBRARIES)
+    get_target_property(target_type ${name} TYPE)
+    if (target_type STREQUAL "STATIC_LIBRARY")
+      add_custom_command(TARGET ${name}
+        POST_BUILD
+        COMMAND touch ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_STATIC_LIBRARY_PREFIX}${name}${CMAKE_STATIC_LIBRARY_SUFFIX}
+        )
+    endif()
+  endif()
+endfunction()
 
 #include(cmakefile)
 
+#include_directories(include)
 
-# LLVM specific (assuming clang/llvm installed under ~/usr)
-# out of source builds
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "$ENV{LLVM_DIR}")
-#find_package(LLVM REQUIRED CONFIG)
-#include(AddLLVM)
-#add_definitions(${LLVM_DEFINITIONS})
-#include_directories(${LLVM_INCLUDE_DIRS})
-#link_directories(${LLVM_LIBRARY_DIRS})
-#add_definitions(-fno-rtti)
-# invoke like this:
-# CC=~/usr/bin/clang CXX=~/usr/bin/clang++ LLVM_DIR=~/usr/lib/cmake/llvm/ cmake ../ -GNinja
-# LLVM specific End
-
-#add_subdirectory(somedir)
+#add_subdirectory(lib)
+#add_subdirectory(src)
 
 # Top Level End
 ################################################################################
 
 #add_subdirectory(somedir)
-
-#find_package(
-# <package> [version] [EXACT] [QUIET] [MODULE]
-# [REQUIRED] [[COMPONENTS] [components...]]
-# [OPTIONAL_COMPONENTS components...]
-# [NO_POLICY_SCOPE])
-
-#include_directories(somedir)
 #add_executable(exe file.cpp)
 #target_link_libraries(exe|lib target|var|etc)
 
 #add_library(name [SHARED] file.cpp)
-
-# simple form needs absolute path
-#add_test(Name ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/executable [arg1 [arg2 ...]])
-
-# more complex, but no need for absolute path
-#add_test(
-# NAME <name> [CONFIGURATIONS [Debug|Release|...]]
-# [WORKING_DIRECTORY dir]
-# COMMAND <command> [arg1 [arg2 ...]])
+#target_link_libraries(name some-other-libs)
+#set_target_properties(name PROPERTIES OUTPUT_NAME "output-name")
