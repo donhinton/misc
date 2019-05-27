@@ -1,0 +1,3 @@
+# Name: AST_DUMP
+# Description: Dumps ast to stdout 
+-Xclang -ast-dump -fsyntax-only

@@ -1,0 +1,3 @@
+# Name: EMIT_LLVM
+# Description: Dumps human readable IR to stdout
+-S -emit-llvm -o -

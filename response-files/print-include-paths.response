@@ -1,0 +1,3 @@
+# Name: PRINT_INCLUDE_PATHS
+# Description: Prints clang include paths to stdout
+-E -x c++ -v /dev/null
