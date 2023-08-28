@@ -1,5 +1,7 @@
 ;; -*- emacs-list -*-
 
+(setq-default default-tab-width 2)
+
 (defun load-if-exists (f)
   (if (file-readable-p f)
       (load-file f)))
